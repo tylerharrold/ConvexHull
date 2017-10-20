@@ -82,34 +82,9 @@ def computeHull(points):
         # first base case
         if len(points) <= 3:
             return points
-        else: # here we implement a naive, brute force approach
+        elif len(points) <= 6: # here we implement a naive, brute force approach
             hullPoints = []
             numPoints = len(points)
-            '''
-            for i in range(0 , numPoints):
-                notFound = True
-                j = (i + 1) % len(points) 
-                while j != i and notFound:
-                    # here we check all lines from point i to all other points for a hull
-                    k = (j + 1) % len(points)
-                    if collinear(points[i] , points[j] , points[k]):
-                        pass
-                    else:
-                        currentTri = cw(points[i] , points[j] , points[k])
-                        allOnOneSide = True
-                        while k != i and allOnOneSide: 
-                            if cw(points[i] , points[j] , points[k]) != currentTri:
-                                allOnOneSide = False
-                            k = (k + 1) % len(points)
-                        if allOnOneSide:
-                            notFound = False
-                            # we add points i and j
-                            if points[i] not in hullPoints:
-                                hullPoints.append(points[i])
-                            if points[j] not in hullPoints:
-                                 hullPoints.append(points[i])
-                    j = (j + 1) % len(points)
-            '''
             for i in range (0 , numPoints):
                 j = (i + 1) % numPoints
                 while j != i:
@@ -137,3 +112,64 @@ def computeHull(points):
                     j = (j + 1) % numPoints
             clockwiseSort(hullPoints)
             return hullPoints
+        else:
+            # our recursive implementation
+            # first we split the points
+            min_x = max_x = points[0][0]
+            min_y = max_y = points[0][1]
+            for point in points:
+                if point[0] < min_x:
+                    min_x = point[0]
+                if point[0] > max_x:
+                    max_x = point[0]    
+                if point[1] < min_y:
+                    min_y = point[1]
+                if point[1] > max_y:
+                    max_y = point[1]
+            demarkation_line = (max_x + min_x) / 2
+            # split the points
+            leftPoints = []
+            rightPoints = []
+            for point in points:
+                x_val = point[0]
+                if x_val <= demarkation_line:
+                    leftPoints.append(point)
+                else:
+                    reightPoints.append(point)
+            return merge(computeHull(leftPoints) , computeHull(rightPoints), min_y , max_y, demarkation_line)
+
+def merge(l_hull , r_hull, min_y , max_y, x_value):
+    # first we want to find the upper tangent
+    upper_tan_points = []
+    i = j = 1
+
+    while(yint(l_hull[i] , r_hull[mod_clockwise(j , len(r_hull))] , x_value , min_y , max_y) < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y)
+            or yint(l_hull[mod_cclockwise(i , len(l_hull)) , r_hull[j] , x_value , min_y , max_y) < yint(l_hull[i] , r_hull[j] , x_value, min_y, max_y)):
+            if yint(l_hull[i] , r_hull[mod_clockwise(j , len(r_hull))] , x_value , min_y , max_y) < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y):
+                j = mod_clockwise(j , len(r_hull))
+            else:
+                i = mod_cclockwise(i , len(l_hull))
+
+    upper_tan_points = [l_hull[i] , r_hull[j]]
+
+    # find lower tangent
+    lower_tan_points = []
+    k = l = 1
+
+    while(yint(l_hull[mod_clockwise(k , len(l_hull)) , r_hull[l] , x_value , min_y , max_y) > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y) or
+        yint(l_hull[k] , r_hull[mod_cclockwise(l , len(r_hull)) , x_value, min_y, max_y) >  yint(l_hull[k] , r_hull[l] , x_value , min_y , max_y)):
+            if yint(l_hull[mod_clockwise(k , len(l_hull)) , r_hull[l] , x_value , min_y , max_y) > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y):
+                k = mod_clockwise(k , len(l_hull))
+            else:
+                l = mod_cclockwise(l , len(r_hull))
+
+    lower_tan_points = [l_hull[k] , r_hull[l]]
+
+    
+    
+
+def mod_clockwise(x , length):
+    return (x+1) % length
+def mod_cclockwise(x , length):
+    return (x - 1) % length
+
