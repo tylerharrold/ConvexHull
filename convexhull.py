@@ -164,16 +164,24 @@ def merge(left , right, min_y , max_y, x_value):
                 l = mod_clockwise(l , len(r_hull))
 
 
+
+    sup_points = []
     # now we need to remove points from l_hull that are clockwise between i and k
     start = mod_clockwise(i , len(l_hull))
     while start != k:
-       l_hull.pop(start) 
+       sup_points.append(start) 
        start = mod_clockwise(start-1 , len(l_hull))
 
     # now we need to remove points from r_hull that are clockwise between l and j
     start = mod_clockwise(l , len(r_hull))
     while start != j:
-        r_hull.pop(start)
+        sup_points.append(start)
+        start = mod_clockwise(start-1 , len(r_hull))
+
+    new_convex_hull = l_hull + r_hull
+    for point in new_convex_hull:
+        if point in sup_points:
+            new_convex_hull.remove(point)
         start = mod_clockwise(start-1 , len(r_hull))
 
     new_convex_hull = l_hull + r_hull
