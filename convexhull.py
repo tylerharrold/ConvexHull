@@ -181,6 +181,7 @@ def merge(left , right, min_y , max_y, x_value):
         start = mod_clockwise(start-1 , len(r_hull))
 
     new_convex_hull = l_hull + r_hull
+    
     for i in pointsToRemove:
         if i in new_convex_hull:
             new_convex_hull.remove(i)
