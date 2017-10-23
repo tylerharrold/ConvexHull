@@ -4,6 +4,10 @@ import sys
 
 EPSILON = sys.float_info.epsilon
 
+
+
+testPoints = [(84, 323), (225, 106), (406, 311), (216, 515), (563, 422), (746, 420), (855, 100), (598, 115)]
+
 '''
 Given two points, p1 and p2,
 an x coordinate, x,
@@ -140,51 +144,55 @@ def computeHull(points):
             return merge(computeHull(leftPoints) , computeHull(rightPoints), min_y , max_y, demarkation_line)
 
 def merge(left , right, min_y , max_y, x_value):
+    print("entering merge")
     l_hull = copy.deepcopy(left)
     r_hull = copy.deepcopy(right)
+    print(l_hull)
+    print(r_hull)
     # first we want to find the upper tangent
     i = j = 1
 
-    while(yint(l_hull[i] , r_hull[mod_cclockwise(j , len(r_hull))] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y)[1]
-            or yint(l_hull[mod_clockwise(i , len(l_hull))] , r_hull[j] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y, max_y)[1]):
-            if yint(l_hull[i] , r_hull[mod_cclockwise(j , len(r_hull))] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y)[1]:
-                j = mod_cclockwise(j , len(r_hull))
+    while(yint(l_hull[i] , r_hull[mod_clockwise(j , len(r_hull))] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y)[1]
+            or yint(l_hull[mod_cclockwise(i , len(l_hull))] , r_hull[j] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y, max_y)[1]):
+            if yint(l_hull[i] , r_hull[mod_clockwise(j , len(r_hull))] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y)[1]:
+                j = mod_clockwise(j , len(r_hull))
             else:
-                i = mod_clockwise(i , len(l_hull))
+                i = mod_cclockwise(i , len(l_hull))
 
 
     # find lower tangent
     k = l = 1
 
-    while(yint(l_hull[mod_cclockwise(k , len(l_hull))] , r_hull[l] , x_value , min_y , max_y)[1] > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y)[1] or
-        yint(l_hull[k] , r_hull[mod_clockwise(l , len(r_hull))] , x_value, min_y, max_y)[1] >  yint(l_hull[k] , r_hull[l] , x_value , min_y , max_y)[1]):
-            if yint(l_hull[mod_cclockwise(k , len(l_hull))] , r_hull[l] , x_value , min_y , max_y)[1] > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y)[1]:
-                k = mod_cclockwise(k , len(l_hull))
+    while(yint(l_hull[mod_clockwise(k , len(l_hull))] , r_hull[l] , x_value , min_y , max_y)[1] > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y)[1] or
+        yint(l_hull[k] , r_hull[mod_cclockwise(l , len(r_hull))] , x_value, min_y, max_y)[1] >  yint(l_hull[k] , r_hull[l] , x_value , min_y , max_y)[1]):
+            if yint(l_hull[mod_clockwise(k , len(l_hull))] , r_hull[l] , x_value , min_y , max_y)[1] > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y)[1]:
+                k = mod_clockwise(k , len(l_hull))
             else:
-                l = mod_clockwise(l , len(r_hull))
+                l = mod_cclockwise(l , len(r_hull))
 
 
-
+    print("index of i" , i)
+    print("index of j" , j)
+    print("index of k" , k)
+    print("index of l" , l)
     sup_points = []
     # now we need to remove points from l_hull that are clockwise between i and k
     start = mod_clockwise(i , len(l_hull))
     while start != k:
-       sup_points.append(start) 
-       start = mod_clockwise(start-1 , len(l_hull))
+       sup_points.append(l_hull[start]) 
+       start = mod_clockwise(start , len(l_hull))
 
     # now we need to remove points from r_hull that are clockwise between l and j
     start = mod_clockwise(l , len(r_hull))
     while start != j:
-        sup_points.append(start)
-        start = mod_clockwise(start-1 , len(r_hull))
+        sup_points.append(r_hull[start])
+        start = mod_clockwise(start , len(r_hull))
 
     new_convex_hull = l_hull + r_hull
     for point in new_convex_hull:
         if point in sup_points:
             new_convex_hull.remove(point)
-        start = mod_clockwise(start-1 , len(r_hull))
 
-    new_convex_hull = l_hull + r_hull
     clockwiseSort(new_convex_hull)
     return new_convex_hull
 
