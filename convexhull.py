@@ -1,3 +1,4 @@
+import copy
 import math
 import sys
 
@@ -135,37 +136,50 @@ def computeHull(points):
                 if x_val <= demarkation_line:
                     leftPoints.append(point)
                 else:
-                    reightPoints.append(point)
+                    rightPoints.append(point)
             return merge(computeHull(leftPoints) , computeHull(rightPoints), min_y , max_y, demarkation_line)
 
-def merge(l_hull , r_hull, min_y , max_y, x_value):
+def merge(left , right, min_y , max_y, x_value):
+    l_hull = copy.deepcopy(left)
+    r_hull = copy.deepcopy(right)
     # first we want to find the upper tangent
-    upper_tan_points = []
     i = j = 1
 
-    while(yint(l_hull[i] , r_hull[mod_clockwise(j , len(r_hull))] , x_value , min_y , max_y) < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y)
-            or yint(l_hull[mod_cclockwise(i , len(l_hull)) , r_hull[j] , x_value , min_y , max_y) < yint(l_hull[i] , r_hull[j] , x_value, min_y, max_y)):
-            if yint(l_hull[i] , r_hull[mod_clockwise(j , len(r_hull))] , x_value , min_y , max_y) < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y):
-                j = mod_clockwise(j , len(r_hull))
+    while(yint(l_hull[i] , r_hull[mod_cclockwise(j , len(r_hull))] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y)[1]
+            or yint(l_hull[mod_clockwise(i , len(l_hull))] , r_hull[j] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y, max_y)[1]):
+            if yint(l_hull[i] , r_hull[mod_cclockwise(j , len(r_hull))] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y)[1]:
+                j = mod_cclockwise(j , len(r_hull))
             else:
-                i = mod_cclockwise(i , len(l_hull))
+                i = mod_clockwise(i , len(l_hull))
 
-    upper_tan_points = [l_hull[i] , r_hull[j]]
 
     # find lower tangent
-    lower_tan_points = []
     k = l = 1
 
-    while(yint(l_hull[mod_clockwise(k , len(l_hull)) , r_hull[l] , x_value , min_y , max_y) > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y) or
-        yint(l_hull[k] , r_hull[mod_cclockwise(l , len(r_hull)) , x_value, min_y, max_y) >  yint(l_hull[k] , r_hull[l] , x_value , min_y , max_y)):
-            if yint(l_hull[mod_clockwise(k , len(l_hull)) , r_hull[l] , x_value , min_y , max_y) > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y):
-                k = mod_clockwise(k , len(l_hull))
+    while(yint(l_hull[mod_cclockwise(k , len(l_hull))] , r_hull[l] , x_value , min_y , max_y)[1] > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y)[1] or
+        yint(l_hull[k] , r_hull[mod_clockwise(l , len(r_hull))] , x_value, min_y, max_y)[1] >  yint(l_hull[k] , r_hull[l] , x_value , min_y , max_y)[1]):
+            if yint(l_hull[mod_cclockwise(k , len(l_hull))] , r_hull[l] , x_value , min_y , max_y)[1] > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y)[1]:
+                k = mod_cclockwise(k , len(l_hull))
             else:
-                l = mod_cclockwise(l , len(r_hull))
+                l = mod_clockwise(l , len(r_hull))
 
-    lower_tan_points = [l_hull[k] , r_hull[l]]
 
-    
+    # now we need to remove points from l_hull that are clockwise between i and k
+    start = mod_clockwise(i , len(l_hull))
+    while start != k:
+       l_hull.pop(start) 
+       start = mod_clockwise(start-1 , len(l_hull))
+
+    # now we need to remove points from r_hull that are clockwise between l and j
+    start = mod_clockwise(l , len(r_hull))
+    while start != j:
+        r_hull.pop(start)
+        start = mod_clockwise(start-1 , len(r_hull))
+
+    new_convex_hull = l_hull + r_hull
+    clockwiseSort(new_convex_hull)
+    return new_convex_hull
+
     
 
 def mod_clockwise(x , length):
