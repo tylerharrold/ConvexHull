@@ -82,6 +82,8 @@ using the divide-and-conquer algorithm
 def computeHull(points):
         # first base case
         if len(points) <= 3:
+            hullPoints = copy.deepcopy(points)
+            clockwiseSort(hullPoints)
             return points
         elif len(points) <= 6: # here we implement a naive, brute force approach
             hullPoints = []
@@ -140,6 +142,7 @@ def computeHull(points):
             return merge(computeHull(leftPoints) , computeHull(rightPoints), min_y , max_y, demarkation_line)
 
 def merge(left , right, min_y , max_y, x_value):
+    # Invariant: Initialization - here we know that left and right consist of clockwise sorted convex hulls
     l_hull = copy.deepcopy(left)
     r_hull = copy.deepcopy(right)
     # first we want to find the upper tangent
@@ -165,18 +168,22 @@ def merge(left , right, min_y , max_y, x_value):
 
 
     # now we need to remove points from l_hull that are clockwise between i and k
+    pointsToRemove = []
     start = mod_clockwise(i , len(l_hull))
     while start != k:
-       l_hull.pop(start) 
-       start = mod_clockwise(start-1 , len(l_hull))
+        pointsToRemove.append(l_hull[start])
+        start = mod_clockwise(start-1 , len(l_hull))
 
     # now we need to remove points from r_hull that are clockwise between l and j
     start = mod_clockwise(l , len(r_hull))
     while start != j:
-        r_hull.pop(start)
+        pointsToRemove.append(r_hull[start])
         start = mod_clockwise(start-1 , len(r_hull))
 
     new_convex_hull = l_hull + r_hull
+    for i in pointsToRemove:
+        if i in new_convex_hull:
+            new_convex_hull.remove(i)
     clockwiseSort(new_convex_hull)
     return new_convex_hull
 
