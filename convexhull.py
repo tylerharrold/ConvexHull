@@ -153,22 +153,22 @@ def merge(left , right, min_y , max_y, x_value):
     i = j = 1
 
     while(yint(l_hull[i] , r_hull[mod_clockwise(j , len(r_hull))] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y)[1]
-            or yint(l_hull[mod_cclockwise(i , len(l_hull))] , r_hull[j] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y, max_y)[1]):
+            or yint(l_hull[mod_clockwise(i , len(l_hull))] , r_hull[j] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y, max_y)[1]):
             if yint(l_hull[i] , r_hull[mod_clockwise(j , len(r_hull))] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y)[1]:
                 j = mod_clockwise(j , len(r_hull))
             else:
-                i = mod_cclockwise(i , len(l_hull))
+                i = mod_clockwise(i , len(l_hull))
 
 
     # find lower tangent
     k = l = 1
 
-    while(yint(l_hull[mod_clockwise(k , len(l_hull))] , r_hull[l] , x_value , min_y , max_y)[1] > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y)[1] or
-        yint(l_hull[k] , r_hull[mod_cclockwise(l , len(r_hull))] , x_value, min_y, max_y)[1] >  yint(l_hull[k] , r_hull[l] , x_value , min_y , max_y)[1]):
-            if yint(l_hull[mod_clockwise(k , len(l_hull))] , r_hull[l] , x_value , min_y , max_y)[1] > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y)[1]:
-                k = mod_clockwise(k , len(l_hull))
+    while(yint(l_hull[mod_cclockwise(k , len(l_hull))] , r_hull[l] , x_value , min_y , max_y)[1] > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y)[1] or
+        yint(l_hull[k] , r_hull[mod_clockwise(l , len(r_hull))] , x_value, min_y, max_y)[1] >  yint(l_hull[k] , r_hull[l] , x_value , min_y , max_y)[1]):
+            if yint(l_hull[mod_cclockwise(k , len(l_hull))] , r_hull[l] , x_value , min_y , max_y)[1] > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y)[1]:
+                k = mod_cclockwise(k , len(l_hull))
             else:
-                l = mod_cclockwise(l , len(r_hull))
+                l = mod_clockwise(l , len(r_hull))
 
 
     print("index of i" , i)
@@ -187,14 +187,21 @@ def merge(left , right, min_y , max_y, x_value):
     while start != j:
         sup_points.append(r_hull[start])
         start = mod_clockwise(start , len(r_hull))
-
+    print("sup points:")
+    print(sup_points)
     new_convex_hull = l_hull + r_hull
+    print("new convex hull:")
+    print(new_convex_hull)
+    finalList = []
     for point in new_convex_hull:
-        if point in sup_points:
-            new_convex_hull.remove(point)
-
-    clockwiseSort(new_convex_hull)
-    return new_convex_hull
+        print("point in consideration:" , point)
+        if point not in sup_points:
+            print("point:" , point , " found is in final hull")
+            finalList.append(point)
+    clockwiseSort(finalList)
+    print("my hull:")
+    print(new_convex_hull)
+    return finalList
 
     
 
