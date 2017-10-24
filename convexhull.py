@@ -86,6 +86,7 @@ using the divide-and-conquer algorithm
 def computeHull(points):
         # first base case
         if len(points) <= 3:
+            clockwiseSort(points)
             return points
         elif len(points) <= 6: # here we implement a naive, brute force approach
             hullPoints = []
@@ -144,37 +145,49 @@ def computeHull(points):
             return merge(computeHull(leftPoints) , computeHull(rightPoints), min_y , max_y, demarkation_line)
 
 def merge(left , right, min_y , max_y, x_value):
-    print("entering merge")
+    # invariant - left, right both contain clockwise sorted convex hulls, each of at least n=1 point
     l_hull = copy.deepcopy(left)
     r_hull = copy.deepcopy(right)
-    print(l_hull)
-    print(r_hull)
+    # search left for the rightmost point
+    rightmost = 0
+    for x in range(0 , len(l_hull)):
+        if l_hull[x][0] > l_hull[rightmost][0]:
+            rightmost = x
+
+    # search right for the leftmost point
+    leftmost = 0 # we assume the leftmost node is the first one
+    for x in range(0 , len(r_hull)):
+        if r_hull[x][0] < r_hull[leftmost][0]:
+            leftmost = x
+
+    # we can get our x val here too
+    x_value = (r_hull[leftmost][0] + l_hull[rightmost][0]) / 2
+    
+
     # first we want to find the upper tangent
-    i = j = 1
+    i = rightmost 
+    j = leftmost
+
 
     while(yint(l_hull[i] , r_hull[mod_clockwise(j , len(r_hull))] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y)[1]
-            or yint(l_hull[mod_clockwise(i , len(l_hull))] , r_hull[j] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y, max_y)[1]):
+            or yint(l_hull[mod_cclockwise(i , len(l_hull))] , r_hull[j] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y, max_y)[1]):
             if yint(l_hull[i] , r_hull[mod_clockwise(j , len(r_hull))] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y)[1]:
                 j = mod_clockwise(j , len(r_hull))
             else:
-                i = mod_clockwise(i , len(l_hull))
+                i = mod_cclockwise(i , len(l_hull))
 
 
     # find lower tangent
-    k = l = 1
+    k = rightmost
+    l = leftmost
 
-    while(yint(l_hull[mod_cclockwise(k , len(l_hull))] , r_hull[l] , x_value , min_y , max_y)[1] > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y)[1] or
-        yint(l_hull[k] , r_hull[mod_clockwise(l , len(r_hull))] , x_value, min_y, max_y)[1] >  yint(l_hull[k] , r_hull[l] , x_value , min_y , max_y)[1]):
-            if yint(l_hull[mod_cclockwise(k , len(l_hull))] , r_hull[l] , x_value , min_y , max_y)[1] > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y)[1]:
-                k = mod_cclockwise(k , len(l_hull))
+    while(yint(l_hull[mod_clockwise(k , len(l_hull))] , r_hull[l] , x_value , min_y , max_y)[1] > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y)[1] or
+        yint(l_hull[k] , r_hull[mod_cclockwise(l , len(r_hull))] , x_value, min_y, max_y)[1] >  yint(l_hull[k] , r_hull[l] , x_value , min_y , max_y)[1]):
+            if yint(l_hull[mod_clockwise(k , len(l_hull))] , r_hull[l] , x_value , min_y , max_y)[1] > yint(l_hull[k] , r_hull[l] , x_value, min_y, max_y)[1]:
+                k = mod_clockwise(k , len(l_hull))
             else:
-                l = mod_clockwise(l , len(r_hull))
+                l = mod_cclockwise(l , len(r_hull))
 
-
-    print("index of i" , i)
-    print("index of j" , j)
-    print("index of k" , k)
-    print("index of l" , l)
     sup_points = []
     # now we need to remove points from l_hull that are clockwise between i and k
     start = mod_clockwise(i , len(l_hull))
@@ -187,23 +200,14 @@ def merge(left , right, min_y , max_y, x_value):
     while start != j:
         sup_points.append(r_hull[start])
         start = mod_clockwise(start , len(r_hull))
-    print("sup points:")
-    print(sup_points)
     new_convex_hull = l_hull + r_hull
-    print("new convex hull:")
-    print(new_convex_hull)
     finalList = []
     for point in new_convex_hull:
-        print("point in consideration:" , point)
         if point not in sup_points:
-            print("point:" , point , " found is in final hull")
             finalList.append(point)
     clockwiseSort(finalList)
-    print("my hull:")
-    print(new_convex_hull)
     return finalList
 
-    
 
 def mod_clockwise(x , length):
     return (x+1) % length

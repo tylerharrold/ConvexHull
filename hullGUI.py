@@ -3,6 +3,7 @@
 # from tkinter import *
 from Tkinter import *
 import copy
+import random
 from convexhull import computeHull
 
 
@@ -23,9 +24,23 @@ def drawPoint(canvas,x,y):
 def showPoints(event):
 	print points
 
+def generate_randos():
+    points = [0] * 500
+    for i in range(0 , len(points)):
+        x = random.randint(100,900)
+        y = random.randint(100 , 600)
+        points[i] = (x,y)
+    return points
+ 
+
 def drawHull():
-        print(points)
-	hull = copy.copy(computeHull(points))
+        bigtest = generate_randos()
+        for b in bigtest:
+            x = b[0]
+            y = b[1]
+            r = 2
+	    w.create_oval(x-r,y-r,x+r,y+r)
+	hull = copy.copy(computeHull(bigtest))
 	hull.append(hull[0])
 	for i in range(0,len(hull)-1):
 		x1 = hull[i][0]
@@ -37,6 +52,7 @@ def drawHull():
 
 master = Tk()
 points = []
+colintest = [(200,200) , (200,300) , (200,400) , (400,400) , (300 , 200) , (300, 400) , (400, 200)]
 
 submit_button = Button(master, text="Draw Hull", command=drawHull)
 submit_button.pack()
@@ -53,3 +69,7 @@ w.pack()
 w.bind('<Button-1>', addPoint)
 
 w.mainloop()
+
+       
+
+bigtest = generate_randos()
