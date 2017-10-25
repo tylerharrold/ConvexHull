@@ -1,8 +1,10 @@
 from convexhull import clockwiseSort
+#from convexhull import naiveHull2 as naiveHull
 from convexhull import naiveHull
 import unittest
 import random
 
+# Test suite for naive implementation of convex hull
 class TestNaiveHull(unittest.TestCase):
     def test_single(self):
         points = [(100,100)]
@@ -132,6 +134,14 @@ class TestNaiveHull(unittest.TestCase):
         clockwiseSort(hullActual)
         self.assertEqual(hullActual, hull)
 
+    # test 6 points, 4 of which are the hull, 2 of which are internal, but not the same point
+    def test_square_with_multiple_nondupe_central(self):
+        points = [(100,100), (200,100) , (150,150) , (100, 200), (200,200), (155, 170)]
+        hull = naiveHull(points)
+        hullActual = [(100,100), (200,100) , (100, 200), (200,200)]
+        clockwiseSort(hullActual)
+        self.assertEqual(hullActual, hull)
+
 
     # test 5 points, 4 of which are colinear and of those 2 of which are the same point
     def test_colin_duplicate_triangle(self):
@@ -147,8 +157,8 @@ class TestNaiveHull(unittest.TestCase):
         clockwiseSort(hullActual)
         points = []
         for i in range(500):
-            x = random.randint(100 , 900)
-            y = random.randint(200, 600)
+            x = random.randint(101 , 899)
+            y = random.randint(201, 599)
             points.append((x,y))
         # now we need to insert the actual hull values into the point list
         for i in range(5):
@@ -156,7 +166,6 @@ class TestNaiveHull(unittest.TestCase):
         hull = naiveHull(points)
         self.assertEqual(hull , hullActual)
 
-
-
+# runnable from command line
 if __name__ == '__main__':
     unittest.main()

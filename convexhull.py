@@ -223,11 +223,15 @@ def mod_cclockwise(x , length):
     return (x - 1) % length
 
 # Naive implementation of the convex hull algorithm. This 
-def naiveHull(points):
+def naiveHull(pointsList):
     hullPoints = []
+    # we want to remove duplicates to avoid issues
+    points = copy.deepcopy(pointsList)
     numPoints = len(points)
     if(numPoints == 1):
         return points
+    if numPoints == 2 and (points[0] == points[1]):
+        return [points[0]]
 
     for i in range (0 , numPoints):
         j = (i + 1) % numPoints
@@ -248,7 +252,7 @@ def naiveHull(points):
                             onHull = False
                 if not onHull:
                     break
-            if onHull:
+            if onHull and (points[i] != points[j]):
                 if points[i] not in hullPoints:
                     hullPoints.append(points[i])
                 if points[j] not in hullPoints:
@@ -256,3 +260,40 @@ def naiveHull(points):
             j = (j + 1) % numPoints
     clockwiseSort(hullPoints)
     return hullPoints
+
+def naiveHull2(input_points):
+    # copy points
+    points = copy.deepcopy(input_points)
+    # remove any duplicates
+
+    if len(points) == 1:
+        return points
+    if len(points) == 2 and (points[0] == points[1]):
+        return [points[0]]
+    
+    hull = []
+    for i in range(0 , len(points)):
+        j = (i+1) % len(points)
+        while j != i:
+            above = []
+            below = []
+            for k in range(0 , len(points)):
+                if collinear(points[i] , points[j] , points[k]):
+                    pass
+                elif cw(points[i] , points[j] , points[k]):
+                    above.append(k)
+                else:
+                    below.append(k)
+            # we add this point only if one of the two lists was empty, also we dont care if i and j are same point, as there is nothing on either side
+            if (not above or not below) and (points[i] != points[j]):
+                # this is on the hull
+                if points[i] not in hull:
+                    hull.append(points[i])
+                if points[j] not in hull:
+                    hull.append(points[j])
+            j = (j+1) % len(points)
+    clockwiseSort(hull)
+    return hull
+            
+    
+    
