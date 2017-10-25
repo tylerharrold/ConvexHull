@@ -19,6 +19,7 @@ def Hull_Queue:
         if self.is_empty():
             return None
         else:
+            return_node = self.queue.pop(0)[0]
             return self.queue.pop(0)[0]
 
     # returns true if queue is empty, false otherwise
@@ -27,7 +28,10 @@ def Hull_Queue:
 
     # dumps the entire queue and returns a copy of the previous queue
     def dump_queue(self):
-        return_copy = copy.deepcopy(self.queue)
+        return_copy = []
+        for node in self.queue:
+            return_copy.append(
+
         self.queue = []
         self.head = 0
         return return_copy

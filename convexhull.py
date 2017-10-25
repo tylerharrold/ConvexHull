@@ -1,6 +1,7 @@
 import copy
 import math
 import sys
+import random
 
 EPSILON = sys.float_info.epsilon
 
@@ -88,7 +89,8 @@ def computeHull(points):
         if len(points) <= 3:
             clockwiseSort(points)
             return points
-        elif len(points) <= 6: # here we implement a naive, brute force approach
+        # for points numbering less than 7, we can brute force our convex hull
+        elif len(points) <= 6: 
             hullPoints = []
             numPoints = len(points)
             for i in range (0 , numPoints):
@@ -142,6 +144,13 @@ def computeHull(points):
                     leftPoints.append(point)
                 else:
                     rightPoints.append(point)
+            # if either of our left or right points is empty, we should just return the sorted non empty one
+            if not leftPoints:
+               clockwiseSort(rightPoints)
+               return rightPoints
+            if not rightPoints:
+                clockwiseSort(leftPoints)
+                return leftPoints
             return merge(computeHull(leftPoints) , computeHull(rightPoints), min_y , max_y, demarkation_line)
 
 def merge(left , right, min_y , max_y, x_value):
@@ -167,7 +176,6 @@ def merge(left , right, min_y , max_y, x_value):
     # first we want to find the upper tangent
     i = rightmost 
     j = leftmost
-
 
     while(yint(l_hull[i] , r_hull[mod_clockwise(j , len(r_hull))] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y , max_y)[1]
             or yint(l_hull[mod_cclockwise(i , len(l_hull))] , r_hull[j] , x_value , min_y , max_y)[1] < yint(l_hull[i] , r_hull[j] , x_value, min_y, max_y)[1]):
@@ -214,3 +222,37 @@ def mod_clockwise(x , length):
 def mod_cclockwise(x , length):
     return (x - 1) % length
 
+# Naive implementation of the convex hull algorithm. This 
+def naiveHull(points):
+    hullPoints = []
+    numPoints = len(points)
+    if(numPoints == 1):
+        return points
+
+    for i in range (0 , numPoints):
+        j = (i + 1) % numPoints
+        while j != i:
+            # we assume ij is on hull
+            onHull = True
+            firstTest = True
+            ccValue = False
+            for k in range(0 , numPoints):
+                if not collinear(points[i] , points[j] , points[k]):
+                    # get if these points are clockwise or counterclockwise
+                    curValue = cw(points[i] , points[j] , points[k])
+                    if firstTest:
+                        ccValue = curValue
+                        firstTest = False
+                    else:
+                        if curValue != ccValue:
+                            onHull = False
+                if not onHull:
+                    break
+            if onHull:
+                if points[i] not in hullPoints:
+                    hullPoints.append(points[i])
+                if points[j] not in hullPoints:
+                    hullPoints.append(points[j])
+            j = (j + 1) % numPoints
+    clockwiseSort(hullPoints)
+    return hullPoints

@@ -5,6 +5,7 @@ from Tkinter import *
 import copy
 import random
 from convexhull import computeHull
+from convexhull import naiveHull
 
 
 def hello(event):
@@ -34,13 +35,13 @@ def generate_randos():
  
 
 def drawHull():
-        bigtest = generate_randos()
-        for b in bigtest:
-            x = b[0]
-            y = b[1]
-            r = 2
-	    w.create_oval(x-r,y-r,x+r,y+r)
-	hull = copy.copy(computeHull(bigtest))
+        #bigtest = generate_randos()
+        #for b in bigtest:
+        #    x = b[0]
+        #    y = b[1]
+        #    r = 2
+	#    w.create_oval(x-r,y-r,x+r,y+r)
+	hull = copy.copy(naiveHull(points))
 	hull.append(hull[0])
 	for i in range(0,len(hull)-1):
 		x1 = hull[i][0]
@@ -52,7 +53,8 @@ def drawHull():
 
 master = Tk()
 points = []
-colintest = [(200,200) , (200,300) , (200,400) , (400,400) , (300 , 200) , (300, 400) , (400, 200)]
+colintest = [(200,200) , (200,300) , (200,400) , (400,400) , (300 , 200) , (300, 400) , (400, 200), (300,300)]
+colintest2= [ (200,200) , (200, 250) , (200, 300), (200, 350) , (200, 400) , (200, 450), (200,500) ]
 
 submit_button = Button(master, text="Draw Hull", command=drawHull)
 submit_button.pack()
