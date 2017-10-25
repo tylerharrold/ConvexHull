@@ -91,35 +91,7 @@ def computeHull(points):
             return points
         # for points numbering less than 7, we can brute force our convex hull
         elif len(points) <= 6: 
-            hullPoints = []
-            numPoints = len(points)
-            for i in range (0 , numPoints):
-                j = (i + 1) % numPoints
-                while j != i:
-                    # we assume ij is on hull
-                    onHull = True
-                    firstTest = True
-                    ccValue = False
-                    for k in range(0 , numPoints):
-                        if not collinear(points[i] , points[j] , points[k]):
-                            # get if these points are clockwise or counterclockwise
-                            curValue = cw(points[i] , points[j] , points[k])
-                            if firstTest:
-                                ccValue = curValue
-                                firstTest = False
-                            else:
-                                if curValue != ccValue:
-                                    onHull = False
-                        if not onHull:
-                            break
-                    if onHull:
-                        if points[i] not in hullPoints:
-                            hullPoints.append(points[i])
-                        if points[j] not in hullPoints:
-                            hullPoints.append(points[j])
-                    j = (j + 1) % numPoints
-            clockwiseSort(hullPoints)
-            return hullPoints
+            return naiveHull(points)  
         else:
             # our recursive implementation
             # first we split the points
